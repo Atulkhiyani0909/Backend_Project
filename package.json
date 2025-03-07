@@ -1,0 +1,12 @@
+{
+  "name": "backend_revision",
+  "version": "1.0.0",
+  "description": "this is the backend devlopment project",
+  "license": "ISC",
+  "author": "Atul Khiyani",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
