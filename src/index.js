@@ -5,10 +5,20 @@ dotenv.config({//this is the experimental feature
 
 import mongoose from 'mongoose';
 import connectDB from './db/index.js';
+import app from './app.js';
 
 
 // Step 2: To connect to MongoDB
-connectDB();
+connectDB()
+.then(()=>{
+    app.listen(process.env.PORT || 8000,()=>{
+        console.log('Server is running on port: ', process.env.PORT);
+    })
+})
+.catch((error)=>{
+    console.log('MongoDB Connection failed: ', error);
+    throw error;
+})
 
 
 
