@@ -1,4 +1,4 @@
-import express, { urlencoded } from 'express'
+import express from 'express'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
@@ -17,6 +17,6 @@ app.use(express.urlencoded({
     limit:'27kb'
 }));//taking the data from the url with limit 
 
-app.use(express.static('public')); // to keep the files inour system if needed
+app.use(express.static('public')); // to keep the files in our system if needed
 app.use(cookieParser());//to set or read the cookies in the browser
 export default app;
