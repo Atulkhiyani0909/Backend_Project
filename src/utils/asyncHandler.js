@@ -1,11 +1,11 @@
-// const asyncHandler=()=>{}
-//another method
 
-//Using Promises this is the advanced sysntax
+
+//Using Promises this is the advanced syntax
+//async handler using the promises
 const asyncHandler1 = (reqHandler) => {
-    return (req, res, next) => {
-      Promise.resolve(reqHandler(req, res, next))
-        .catch(next); // If an error occurs, Express will handle it via middleware
+     (req, res, next) => {
+      Promise.resolve(reqHandler(req, res, next))//resolve our function
+      .catch((err)=>next(err))//catch or reject the error here 
     };
   };
   
@@ -23,18 +23,21 @@ app.get('/users', asyncHandler(async (req, res) => {
 }));
 
 */
-const asyncHandler = (fn) => {
-    return async (req, res, next) => {
-      try {
-        await fn(req, res, next);
-      } catch (error) {
-        res.status(error.status || 500).json({
-          message: error.message || "Internal Server Error",
+
+//this is the async handler using the try catch
+//const ayncHandler = (fn)={()=>{}};     passsing fn to another fn  higher order function
+
+
+//this is the wrapper function that wraps async route handlers
+const asyncHandler=(fn)=async(req,res,next)=>{
+     try {
+        await fn(req,res,next);
+     } catch (error) {
+        res.status(error.code || 500).json({
+          message:error.message || "Something went Wrong",
           success: false,
         });
-      }
-    };
-  };
-  
+     }
+}
 
 
