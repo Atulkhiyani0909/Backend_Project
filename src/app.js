@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 
 const app=express();
 app.use(cors({
-    origin:process.env.CORS_ORIGIN
+    origin:process.env.CORS_ORIGIN  //to accept the request from diff origins * from all in development mode 
 }));//diff servers to accept the request 
 
 
@@ -19,4 +19,8 @@ app.use(express.urlencoded({
 
 app.use(express.static('public')); // to keep the files in our system if needed
 app.use(cookieParser());//to set or read the cookies in the browser
+
+
 export default app;
+
+//(err,req,res,next)  //this is the parameters taken to handle request

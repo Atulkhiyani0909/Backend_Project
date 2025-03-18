@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
-dotenv.config({//this is the experimental feature
-    path: './env'
-});
-
 import mongoose from 'mongoose';
+
+dotenv.config();
+
+
 import connectDB from './db/index.js';
 import app from './app.js';
 
