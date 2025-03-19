@@ -53,20 +53,20 @@ let userSchema=new Schema({
 
 //we are using hooks here -> Hooks means to perform some actions just before saving the data to the DB 
 //we will use bcrypt to secure our password just before saving the data to the DB
-
+// on save we have to perform the task
 userSchema.pre("save",async function(next){
-    if(!this.isModified('password')) return next();  // isModefied is the property of the MongoDb to check whether the field is modified or not
+    if(!this.isModified('password')) return next();  // isModified is the property of the MongoDb to check whether the field is modified or not
 
        // .pre() to run before saving the data to the DB
     //hashing the password before saving it to the database using bcrypt using 10 rounds 
-      this.password=bcrypt.hash(this.password,10);
+      this.password=await bcrypt.hash(this.password,10);
       next();
     
 }); 
 
 
 
-//omparing the passwords
+//comparing the passwords
 
 userSchema.methods.comparePassword=async function(candidatePassword){
     return await bcrypt.compare(candidatePassword,this.password);
@@ -80,18 +80,19 @@ userSchema.methods.generateAccessToken=function(){
         fullname:this.fullname,
         email:this.email
     },
-    process.env.ACCESS_TOKEN,
+    process.env.ACCESS_TOKEN_SECRET,
     {
         expiresIn:process.env.ACCESS_TOKEN_EXPIRATION
     }
 )
 }
 
+//generally for moree time than access token
 userSchema.methods.generateRefreshToken=function(){
     return jwt.sign({
         _id:this._id,
     },
-    process.env.REFRESH_TOKEN,
+    process.env.REFRESH_TOKEN_SECRET,
     {
         expiresIn:process.env.REFRESH_TOKEN_EXPIRATION
     }

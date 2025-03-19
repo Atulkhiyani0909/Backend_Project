@@ -38,7 +38,8 @@ const videoSchema=new Schema({
     timestamps:true
 });
 
-//this allow to to write the aggeigation pipelines on the Schema
+//this allow to to write the aggeigation pipelines on the Schema this is more advanced search in DB it is more usefull than tradinational find() method
+
 videoSchema.plugin(mongooseAggregatePaginate);   
 
 export const Video=mongoose.model('Video',videoSchema);
