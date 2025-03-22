@@ -3,7 +3,7 @@
 //Using Promises this is the advanced syntax
 //async handler using the promises
 const asyncHandler1 = (reqHandler) => {
-     (req, res, next) => {
+     return (req, res, next) => {
       Promise.resolve(reqHandler(req, res, next))//resolve our function
       .catch((err)=>next(err))//catch or reject the error here 
     };
@@ -29,7 +29,8 @@ app.get('/users', asyncHandler(async (req, res) => {
 
 
 //this is the wrapper function that wraps async route handlers
-const asyncHandler=(fn)=async(req,res,next)=>{
+
+/*const asyncHandler=(fn)=async(req,res,next)=>{
      try {
         await fn(req,res,next);
      } catch (error) {
@@ -39,5 +40,6 @@ const asyncHandler=(fn)=async(req,res,next)=>{
         });
      }
 }
+     */
 
 

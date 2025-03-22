@@ -21,6 +21,10 @@ app.use(express.static('public')); // to keep the files in our system if needed
 app.use(cookieParser());//to set or read the cookies in the browser
 
 
+import userRouter from  './routes/user.routes.js'
+app.use("/api/v1/users",userRouter);
+
+
 export default app;
 
 //(err,req,res,next)  //this is the parameters taken to handle request

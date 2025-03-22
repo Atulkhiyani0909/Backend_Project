@@ -1,0 +1,37 @@
+HTTP -> Hyper text Transfer Protocol
+HTTPs -> Hyper text Transfer Protocol(one more layer)  Direct Transfer from Server to Client not readble b/w the path 
+
+URL -> Uniform Resource Locator
+URI -> Uniform Resource Identifier
+
+#Common Headers 
+Request Headers -> from Client
+Response Headers -> from Server
+Representation Headers -> encoding/compression
+Payload Headers -> data
+
+#Most Common Headers
+Accept : application/json
+User : Agent
+Authorization : Bearer
+Content-Type 
+Cookies
+Cache-Control  
+
+#Cors
+Access-Control-Allow-Origin
+Access-Control-Allow-Credentials
+Access-Control-Allow-Methods
+
+#Security Policy
+Cross Origin  Embedded Policy
+Cross-Origin-Opener Policy
+Content Security Policy
+X-XSS-Protection
+
+#HTTP Status Code
+1XX -> Information
+2XX -> Success
+3XX -> Redirection
+4XX -> Client Error
+5XX -> Server Error

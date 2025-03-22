@@ -35,3 +35,11 @@ import fs from 'fs'; //file system avaliable in Node.js to use files in the back
             return null;
         }
   }
+
+
+  export {uploadToCloudinary}
+
+
+  //Uniform Resource Locator URL
+  //Uniform Resource Identifier URI
+  //Uniform Resource Network   URN
