@@ -5,6 +5,7 @@ import {User} from '../models/user.model.js';
 import {uploadToCloudinary} from '../utils/cloudinary.js';
 import {APIResponse} from '../utils/ApiResponse.js';
 
+
 const registerUser=asyncHandler1(async(req,res)=>{
     //taking data from users
     //validation -> not empty 
@@ -37,6 +38,7 @@ const registerUser=asyncHandler1(async(req,res)=>{
       throw new APIError(409,"User already exists");
    }
     
+   
    let avatarLocalPath=req.files?.avatar[0]?.path
    let coverImageLocalPath=req.files?.coverImage[0]?.path
    if(!avatarLocalPath){
@@ -44,6 +46,7 @@ const registerUser=asyncHandler1(async(req,res)=>{
    }
    
    const avatar=await uploadToCloudinary(avatarLocalPath);
+   console.log(avatar);
    const coverImage=await uploadToCloudinary(coverImageLocalPath);
 
    if(!avatar){
@@ -56,13 +59,14 @@ const registerUser=asyncHandler1(async(req,res)=>{
        username:username.toLowerCase(),
        email:email,
        password:password,
-       avatar:avatar.url,
-       coverImage:coverImage?.url || ""//check is the url of the img is avaliable if not use empty
+       avatar:avatar,
+       coverImage:coverImage
    })
  
    let createdUser=await User.findById(newUser._id).select(
      "-password -refreshToken" //this is to remove the password and refresh token from the response
    )
+  
 
    if(!createdUser){
     throw new  APIError(500,"Something Went Wrong");

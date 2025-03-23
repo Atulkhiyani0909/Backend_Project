@@ -1,8 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs'; //file system avaliable in Node.js to use files in the backend
 
 
     // Configuration of the cloudinary
+
     cloudinary.config({ 
         cloud_name: process.env.CLOUD_NAME, 
         api_key: process.env.CLOUD_API_KEY, 
@@ -13,6 +16,7 @@ import fs from 'fs'; //file system avaliable in Node.js to use files in the back
   const uploadToCloudinary = async(localFilePath)=>{
         try {
             if(!localFilePath) return null;
+            console.log(localFilePath);
 
             //uploading the file to the cloudinary
             const file_Details=await cloudinary.uploader.upload(localFilePath,{
