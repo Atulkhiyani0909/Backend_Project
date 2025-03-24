@@ -77,6 +77,68 @@ const registerUser=asyncHandler1(async(req,res)=>{
     )
 })
 
+const AccessAndRefreshToken =async (userId)=>{
+      try {
+        const user = await User.findById(userId);//finding user based on the id of the user
+         const refreshToken = await user.generateRefreshToken();
+         const AccessToken=await user.generateAccessToken();
+         
+         User.refreshToken=refreshToken;
+         await user.save({validateBeforeSave:false});//because when we are savinf the password with validation and all stop that all here 
+
+         return {AccessToken,refreshToken};
+      } catch (error) {
+        throw new APIError(500,"Something went wrong");
+      }
+}
+
+const loginUser=asyncHandler1(async(req,res)=>{
+  //taking data from users
+  //validation -> not empty 
+  //check password
+  //generate token
+  //return token
+
+  let {username,email,password}=req.body;
+
+  let user=await User.findOne({
+    $or:[{username},{email}]
+  });
+
+  if(!user){
+    throw new APIError(401,"User Doesn't Exists");
+  }
 
 
-export {registerUser}
+  let isCorrect=await user.comparePassword(password);
+  if(!isCorrect){
+    throw new APIError(401,"Invalid Credentials");
+  }
+
+
+   const {AccessToken,refreshToken}=await AccessAndRefreshToken(user._id);
+   
+
+   const loggedInUser=await User.findById(user._id).select("-password  -refreshToken");
+
+   const options={  //this is because now this cookies are not modifiable by the frontend but this can be modified by backend only 
+    httpOnly:true,   
+    secure:true
+   }
+
+//sending the cookie in the response  and sending the user loggedInUser refresh token access token as json response
+   return res.status(200).cookie("accessToken" ,AccessToken).cookie("refreshToken", refreshToken).json(
+    new APIResponse(200,{
+      user:loggedInUser ,refreshToken ,AccessToken
+    },
+    "User Logged In Successfully"
+  )
+   ); 
+})
+
+
+const logoutUser=asyncHandler1(async(req,res)=>{
+  
+})
+
+export {registerUser ,loginUser}
