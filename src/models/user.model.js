@@ -32,15 +32,16 @@ let userSchema=new Schema({
     coverImage:{
         type:String, //cloudinary url
     },
+    refreshToken:{
+        type:String,// It is a unique token that is used to obtain additional access tokens. This allows you to have short-lived access tokens without having to collect credentials every time one expires.
+    },
     watchHistory:[
         {
             type:Schema.Types.ObjectId,
             ref:'Video',
         }
     ],
-    refreshToken:{
-        type:String,// It is a unique token that is used to obtain additional access tokens. This allows you to have short-lived access tokens without having to collect credentials every time one expires.
-    },
+   
     password:{
         type:String,
         required:[true,'Password is required'],

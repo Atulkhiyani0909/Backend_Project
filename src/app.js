@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
+
 const app=express();
 app.use(cors({
     origin:process.env.CORS_ORIGIN  //to accept the request from diff origins * from all in development mode 
