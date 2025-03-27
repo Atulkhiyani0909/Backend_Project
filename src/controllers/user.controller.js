@@ -54,9 +54,17 @@ const registerUser=asyncHandler1(async(req,res)=>{
     
    
    let avatarLocalPath=req.files?.avatar[0]?.path
+   console.log("This is the avatar Img" , avatarLocalPath);
+   
    let coverImageLocalPath=req.files?.coverImage[0]?.path
+   console.log("This is the cover Img" , coverImageLocalPath);
+   
    if(!avatarLocalPath){
     throw new APIError(400,"Avatar Img is required");
+   }
+
+   if(!coverImageLocalPath){
+    throw new APIError(400,"Cover Img is required");
    }
    
    const avatar=await uploadToCloudinary(avatarLocalPath);
@@ -66,6 +74,11 @@ const registerUser=asyncHandler1(async(req,res)=>{
    if(!avatar){
      throw new APIError(500,"Failed to upload Avatar to Cloud");
    }
+
+   if(!coverImage){
+    throw new APIError(500,"Failed to upload cover Image to Cloud");
+  }
+
 
 
    let newUser=await User.create({
@@ -267,12 +280,15 @@ const updateUser=asyncHandler1(async(req,res)=>{
 
 
 const updateUserAvatar=asyncHandler1(async(req,res)=>{
-  req.file=req.body;
+  console.log("This is the avatar ",req.file);
+  
+  
   let avatarFilePath=req.file?.path;
   if(!avatarFilePath){
     throw new APIError(400,"Avatar Image is required");
   }
   let url=await uploadToCloudinary(avatarFilePath);
+
   if(!url){
     throw new APIError(500,"Failed to upload Avatar to Cloud");
   }

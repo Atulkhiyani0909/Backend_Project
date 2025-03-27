@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs'; //file system avaliable in Node.js to use files in the backend
+import { response } from 'express';
+import { log } from 'console';
 
 
     // Configuration of the cloudinary

@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { currPasswordChange, loginUser, logoutUser, refreshAccessToken, registerUser, updateUser } from "../controllers/user.controller.js";
+import { currPasswordChange, loginUser, logoutUser, refreshAccessToken, registerUser, updateUser, updateUserAvatar, updateUserCoverImage } from "../controllers/user.controller.js";
 import { body } from 'express-validator';
 import {upload} from '../middlewares/multer.middleware.js'
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 router.route('/register').post(
@@ -48,10 +47,10 @@ router.route("/update-password").post(verifyJWT,
 
   router.route("/update-avatar").post(verifyJWT,
     upload.single("avatar"),
-    updateUser);
+    updateUserAvatar);
 
     router.route("/update-cover-image").post(verifyJWT,
       upload.single("coverImage"),
-      updateUser);
+      updateUserCoverImage);
 
 export default router
