@@ -229,4 +229,90 @@ const refreshAccessToken = asyncHandler1(async (req, res) => {
 });
 
 
-export {registerUser ,loginUser,logoutUser, refreshAccessToken}
+const currPasswordChange=asyncHandler1(async(req,res)=>{
+   const {oldPassword,newPassword} = req.body;
+   const user=await User.findById(req.user?._id).lean();// this lean() will convert the mongoose object to the plain object
+   console.log((user));
+   const isPassword=await user.comparePassword(oldPassword);
+   if(!isPassword){
+     throw new APIError(401,"Invalid Password");
+   }
+
+   user.password=newPassword;
+   await user.save({validateBeforeSave:false});
+
+   return res.status(200).json(new APIResponse(200,{},"Password Changed Successfully"));
+   
+})
+
+
+const getCurrentUser=asyncHandler1(async(req,res)=>{
+  return res.status(200).json(new APIResponse(200,req.user,"Current User Details"));
+})
+
+const updateUser=asyncHandler1(async(req,res)=>{
+  const {Name,email} =req.body;
+
+  const user=await User.findByIdAndUpdate(req.user?._id,{
+    $set:{
+      Name:Name,
+      email:email
+    }
+  },{
+    new:true
+  }).select("-password -refreshToken");
+
+  return res.status(200).json(new APIResponse(200,user,"User Updated Successfully"));
+})
+
+
+const updateUserAvatar=asyncHandler1(async(req,res)=>{
+  req.file=req.body;
+  let avatarFilePath=req.file?.path;
+  if(!avatarFilePath){
+    throw new APIError(400,"Avatar Image is required");
+  }
+  let url=await uploadToCloudinary(avatarFilePath);
+  if(!url){
+    throw new APIError(500,"Failed to upload Avatar to Cloud");
+  }
+
+  const user=await User.findByIdAndUpdate(req.user?._id,{
+    $set:{
+      avatar:url
+    }
+  },{
+    new:true
+  }).select("-password -refreshToken");
+
+
+  return res.status(200).json(new APIResponse(200,user,"Avatar Updated Successfully"));
+
+})
+
+
+const updateUserCoverImage=asyncHandler1(async(req,res)=>{
+  req.file=req.body;
+  let CoverImgPath=req.file?.path;
+  if(!CoverImgPath){
+    throw new APIError(400,"Cover Image is required");
+  }
+  let url=await uploadToCloudinary(CoverImgPath);
+  if(!url){
+    throw new APIError(500,"Failed to upload Avatar to Cloud");
+  }
+
+  const user=await User.findByIdAndUpdate(req.user?._id,{
+    $set:{
+      coverImage:url
+    }
+  },{
+    new:true
+  }).select("-password -refreshToken");
+
+
+  return res.status(200).json(new APIResponse(200,user,"Cover Image Updated Successfully"));
+
+})
+  
+export {registerUser ,loginUser,logoutUser, refreshAccessToken, getCurrentUser,currPasswordChange,updateUser,updateUserAvatar,updateUserCoverImage}

@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { loginUser, logoutUser, refreshAccessToken, registerUser } from "../controllers/user.controller.js";
+import { currPasswordChange, loginUser, logoutUser, refreshAccessToken, registerUser, updateUser } from "../controllers/user.controller.js";
 import { body } from 'express-validator';
 import {upload} from '../middlewares/multer.middleware.js'
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 router.route('/register').post(
@@ -36,5 +37,21 @@ router.route("/logout").post(verifyJWT,logoutUser);
 
 router.route("/refresh-token").post(refreshAccessToken);
 
+router.route("/update-profile").post(verifyJWT,
+  body("email").trim().optional().isEmail().withMessage("Email is required"),
+  body("Name").trim().optional().isLength(3).withMessage("Username must be at least 3 characters")
+  ,updateUser);
+
+router.route("/update-password").post(verifyJWT,
+  body("password").trim().isLength(6).withMessage("Password is required")
+  ,currPasswordChange);
+
+  router.route("/update-avatar").post(verifyJWT,
+    upload.single("avatar"),
+    updateUser);
+
+    router.route("/update-cover-image").post(verifyJWT,
+      upload.single("coverImage"),
+      updateUser);
 
 export default router
