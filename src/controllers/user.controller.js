@@ -404,4 +404,4 @@ const getUserChannelProfile=asyncHandler1(async(req,res)=>{
   return res.status(200).json(new APIResponse(200,channel[0],"Channel Profile"));
 })
   
-export {registerUser ,loginUser,logoutUser, refreshAccessToken, getCurrentUser,currPasswordChange,updateUser,updateUserAvatar,updateUserCoverImage}
+export {registerUser ,loginUser,logoutUser, refreshAccessToken, getCurrentUser,currPasswordChange,updateUser,updateUserAvatar,updateUserCoverImage,getUserChannelProfile}
