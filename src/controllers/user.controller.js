@@ -330,5 +330,78 @@ const updateUserCoverImage=asyncHandler1(async(req,res)=>{
   return res.status(200).json(new APIResponse(200,user,"Cover Image Updated Successfully"));
 
 })
+
+const getUserChannelProfile=asyncHandler1(async(req,res)=>{
+    const {Name}=req.params
+
+    if(!Name?.trim()){
+      throw new APIError(400,"userName is missing");
+    }
+
+    //this is the aggregate it taks the array and we can write the pipelines inside it 
+    const channel =await User.aggregate([
+      {
+      $match:{
+        Name:Name?.toLowerCase(),
+      }
+    },
+    {
+      $lookup:{    //this means that search the Users _id(local field) in the foreign field(channel) in the subscription collection as the all output in the array of the subscribers
+        from:"subscriptions",
+        localField:"_id",
+        foreignField:"channel",
+        as:"subscribers"
+      }
+    },
+      {
+       $lookup:{// this tell that haow many channel the user has subscribed to
+          from:"subscriptions",
+          localField:"_id",
+          foreignField:"subscriber",
+          as:"subscriptions"
+        }
+      },
+      {
+        $addfiled:{//this field are added in the final answer obj.
+          subscriberCount:{
+            $size:"$subscribers"
+          },
+          subscriptionCount:{
+            $size:"$subscriptions"
+          },
+          isSubscribed:{// here we are checking that user is subscribed to the list of the channel or not
+            $cond:{
+              if:{ //$in means that check indide  what , where 
+                $in:[req.user?._id,"$subscribers.subscriber"]
+              },
+              then:true,
+              else:false
+            }
+          }
+        }
+      },
+      {
+        $project:{//this is to remove the fields from the final output and what to include
+          Name:1,
+          subscriberCount:1,
+          username:1,
+          isSubscribed:1,
+          avatar:1,
+          coverImage:1,
+          subscriptionCount:1,
+          email:1
+        }
+      }
+  ]);
+
+  console.log("This what aggreate returns ",channel);
+  
+
+  if(!channel?.length){
+    throw new APIError(404,"Channel Not Found");
+  }
+
+  return res.status(200).json(new APIResponse(200,channel[0],"Channel Profile"));
+})
   
 export {registerUser ,loginUser,logoutUser, refreshAccessToken, getCurrentUser,currPasswordChange,updateUser,updateUserAvatar,updateUserCoverImage}
