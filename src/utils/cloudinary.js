@@ -2,12 +2,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs'; //file system avaliable in Node.js to use files in the backend
-import { response } from 'express';
-import { log } from 'console';
 
 
-    // Configuration of the cloudinary
-
+    // Configuration of the cloudinary         
     cloudinary.config({ 
         cloud_name: process.env.CLOUD_NAME, 
         api_key: process.env.CLOUD_API_KEY, 
@@ -23,7 +20,7 @@ import { log } from 'console';
             //uploading the file to the cloudinary
             const file_Details=await cloudinary.uploader.upload(localFilePath,{
                 resource_type:"auto",
-                folder:'backend'
+                folder:'backend' // to save in which folder in the cloudinary
             });
             
             //file has been successfully uploaded
@@ -33,10 +30,10 @@ import { log } from 'console';
             fs.unlinkSync(localFilePath); //removing the files from the local storage after uploading them to cloudinary
             
             if(!file_Details) return null;
-            return file_Details?.secure_url;
+            return file_Details;
             
         } catch (error) {
-            fs.unlinkSync(localFilePath); //removing file from our localStorage in case of the error 
+            fs.unlinkSync(localFilePath); //removing file from our localStorage in case of the error
             console.log("Error uploading to cloudinary: ", error);
             return null;
         }

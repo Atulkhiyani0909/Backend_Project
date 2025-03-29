@@ -6,11 +6,11 @@ import cookieParser from 'cookie-parser';
 const app=express();
 app.use(cors({
     origin:process.env.CORS_ORIGIN  //to accept the request from diff origins * from all in development mode 
-}));//diff servers to accept the request 
+}));//diff servers to accept the request in production we give the link of our frontend
 
 
 app.use(express.json({
-    limit:'27kb' //how much we will accept the json data
+    limit:'27kb' //how much we will accept the json  like data from the form 
 }));
 
 app.use(express.urlencoded({
@@ -23,7 +23,10 @@ app.use(cookieParser());//to set or read the cookies in the browser
 
 
 import userRouter from  './routes/user.routes.js'
+import videoRouter from './routes/video.routes.js'
+
 app.use("/api/v1/users",userRouter);
+app.use("/api/v1/videos",videoRouter);
 
 
 export default app;

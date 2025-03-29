@@ -16,17 +16,17 @@ export const verifyJWT= asyncHandler1(async(req,_,next)=>{
       throw new APIError(401,"Unauthorized access");
     }
   
-    const decoded=await jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+    const decoded=await jwt.verify(token,process.env.ACCESS_TOKEN_SECRET); 
     console.log(decoded); 
   
-    const userLoggedIn=await User.findById(decoded?._id).select("-password -refreshToken");
+    const userLoggedIn=await User.findById(decoded?._id).select("-password -refreshToken");//don't need the refreshToken and password from the users data
   
     if(!userLoggedIn) {
       throw new APIError(401,"Invalid access token");
     }
   
   
-    //making the new request
+    //making the new request this can be used in the full application as this is the req which is globally
     req.user=userLoggedIn;
     next();
   } catch (error) {
