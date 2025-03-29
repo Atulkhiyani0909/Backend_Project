@@ -5,6 +5,7 @@ import {User} from '../models/user.model.js';
 import {uploadToCloudinary} from '../utils/cloudinary.js';
 import {APIResponse} from '../utils/ApiResponse.js';
 import jwt, { decode } from "jsonwebtoken"
+import mongoose from 'mongoose';
 
 const AccessAndRefreshToken =async (userId)=>{
       try {
@@ -403,5 +404,57 @@ const getUserChannelProfile=asyncHandler1(async(req,res)=>{
 
   return res.status(200).json(new APIResponse(200,channel[0],"Channel Profile"));
 })
+
+const getWatchHistory=asyncHandler1(async(req,res)=>{
+
+  //take the user from the req.user search it in the video and watchHistory of the user using the lookup and apply the nested lookup as the there is the owner in the video field inside the video 
+
+  const user=await User.aggregate([{
+    $match:{
+      _id:new mongoose.Types.ObjectId(req.user._id)//this is to convert the string (req.user._id) to the object id as the id in the DB is in the object id format
+    },
+  },
+  {
+    $lookup:{
+      from:"videos",
+      localField:"watchHistory",
+      foreignField:"_id",
+      as:"watchHistory",
+      pipeline:[//now we are inside the videos and we want owners as they are users
+        {
+          $lookup:{
+            from:"users",
+            localField:"owner",
+            foreignField:"_id",
+            as:"owner",
+            pipeline:[//a swe want to apply the pipeline inside the owner as we want to get the name and avatar of the owner
+              {
+                $project:{
+                  Name:1,
+                  username:1,
+                  avatar:1
+                }
+              }
+            ]
+          }
+        },
+        {
+          $addFields:{
+            owner:{
+              $first:"$owner"//this is to get the first element of the array as we are getting the array of the owner
+            }
+          }
+        }
+      ]
+    }
+  }
+
+])
+
+
+return res.status(200).json(new APIResponse(200,
+  user[0].watchHistory
+,"Watch History Fetched Successfully"));
+})
   
-export {registerUser ,loginUser,logoutUser, refreshAccessToken, getCurrentUser,currPasswordChange,updateUser,updateUserAvatar,updateUserCoverImage,getUserChannelProfile}
+export {registerUser ,loginUser,logoutUser, refreshAccessToken, getCurrentUser,currPasswordChange,updateUser,updateUserAvatar,updateUserCoverImage,getUserChannelProfile,getWatchHistory}

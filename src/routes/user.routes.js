@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { currPasswordChange, loginUser, logoutUser, refreshAccessToken, registerUser, updateUser, updateUserAvatar, updateUserCoverImage } from "../controllers/user.controller.js";
+import { getUserChannelProfile,currPasswordChange, getCurrentUser, getWatchHistory, loginUser, logoutUser, refreshAccessToken, registerUser, updateUser, updateUserAvatar, updateUserCoverImage } from "../controllers/user.controller.js";
 import { body } from 'express-validator';
 import {upload} from '../middlewares/multer.middleware.js'
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -36,21 +36,28 @@ router.route("/logout").post(verifyJWT,logoutUser);
 
 router.route("/refresh-token").post(refreshAccessToken);
 
-router.route("/update-profile").post(verifyJWT,
+router.route("/update-profile").patch(verifyJWT,
   body("email").trim().optional().isEmail().withMessage("Email is required"),
   body("Name").trim().optional().isLength(3).withMessage("Username must be at least 3 characters")
-  ,updateUser);
+  ,updateUser);  // because patch will not update all the details
 
 router.route("/update-password").post(verifyJWT,
   body("password").trim().isLength(6).withMessage("Password is required")
   ,currPasswordChange);
 
-  router.route("/update-avatar").post(verifyJWT,
+  router.route("/update-avatar").patch(verifyJWT,
     upload.single("avatar"),
     updateUserAvatar);
 
-    router.route("/update-cover-image").post(verifyJWT,
+    router.route("/update-cover-image").patch(verifyJWT,
       upload.single("coverImage"),
       updateUserCoverImage);
+
+      router.route("/current-user").get(verifyJWT,getCurrentUser);
+
+      router.route("/getUserChannel/:username").get(verifyJWT,getUserChannelProfile);
+
+      router.route("/watchHistory").get(verifyJWT,getWatchHistory);
+
 
 export default router
