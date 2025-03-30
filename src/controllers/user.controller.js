@@ -355,7 +355,7 @@ const getUserChannelProfile=asyncHandler1(async(req,res)=>{
       }
     },
       {
-       $lookup:{// this tell that haow many channel the user has subscribed to
+       $lookup:{// this tell that how many channel the user has subscribed to
           from:"subscriptions",
           localField:"_id",
           foreignField:"subscriber",
@@ -372,7 +372,7 @@ const getUserChannelProfile=asyncHandler1(async(req,res)=>{
           },
           isSubscribed:{// here we are checking that user is subscribed to the list of the channel or not
             $cond:{
-              if:{ //$in means that check indide  what , where 
+              if:{ //$in means that check inside  [what , where] 
                 $in:[req.user?._id,"$subscribers.subscriber"]
               },
               then:true,

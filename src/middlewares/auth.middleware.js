@@ -17,7 +17,7 @@ export const verifyJWT= asyncHandler1(async(req,_,next)=>{
     }
   
     const decoded=await jwt.verify(token,process.env.ACCESS_TOKEN_SECRET); 
-    console.log(decoded); 
+    // console.log(decoded); 
   
     const userLoggedIn=await User.findById(decoded?._id).select("-password -refreshToken");//don't need the refreshToken and password from the users data
   

@@ -72,17 +72,57 @@ const getVideoById = asyncHandler1(async (req, res) => {
 const updateVideo = asyncHandler1(async (req, res) => {
     const { videoId } = req.params
     const {title,description}=req.body
-    console.log(title , description);
+  
+    const checkVideo=await Video.findById(videoId);
+    if(!checkVideo){
+        return res.status(400).json(
+            new APIResponse(400,{},"Video Not Avaliable")
+        )
+    }
+
+    const videoOwner = await Video.aggregate([
+        {
+          $match: {
+            _id: new mongoose.Types.ObjectId(videoId)
+          }
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "owner",
+            foreignField: "_id",
+            as: "Owner",     // project is written inside the lookup so it can bring the required field only
+            pipeline: [
+              {
+                $project: {
+                  _id:1,
+                  Name: 1,
+                  username: 1,
+                  email: 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          $unwind: {
+            path: "$Owner",
+            preserveNullAndEmptyArrays: true
+          }
+        }
+      ]);
+      
     
-    
+    if(!((req.user._id).toString() === (videoOwner[0].Owner._id).toString())){
+        console.log("You Can't Edit this Video not Owner");
+        return res.status(403).json(
+            new APIResponse(403,{},"Not an Owner")
+        );
+    }
     
     //TODO: update video details like title, description, thumbnail
 
-    if(!req.file){
-      throw new APIError(400, "Thumbnail Missing");
-    }
-
-   const thumbnailLocalPath=req.file?.path;
+   const thumbnailLocalPath=req.file?.path || checkVideo.thumbnail;
    
     const thumbnailTOCloud=await uploadToCloudinary(thumbnailLocalPath);
     
@@ -101,7 +141,6 @@ const updateVideo = asyncHandler1(async (req, res) => {
     return res.status(201).json(
         new APIResponse(200,videoInfo,"Video Updated Successfully")
     )
-
 })
 
 const deleteVideo = asyncHandler1(async (req, res) => {
