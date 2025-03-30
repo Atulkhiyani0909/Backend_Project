@@ -5,6 +5,51 @@ import {APIError} from "../utils/ApiError.js"
 import {APIResponse} from "../utils/ApiResponse.js"
 import {asyncHandler1} from "../utils/asyncHandler.js"
 import {OwnerCheck} from "../utils/videoOwner.js"
+import aggregatePaginate  from "mongoose-aggregate-paginate-v2";
+
+
+
+
+//this is the one of the Most Critical Part of this Controllers
+const getAllVideos = asyncHandler1(async (req, res) => {
+    const { page , limit } = req.query
+    //TODO: get all videos based on query, sort, pagination
+
+    const video= [ //don't use await with this as it will resolve and give 
+        {
+            $match:{
+                isPublished:true
+            }
+        },
+        {
+            $sort:{
+                createdAt:-1
+            }
+        },
+        {
+            $project:{
+                title:1,
+                description:1
+            }
+        }
+    ]
+
+    const options={//options need to be pass while pagination page to show and limit
+        page,
+        limit
+    }
+    
+    //pass the Video.aggrate(video) it inside aggreatepaginate only otherwise it already executed //pass the piplines here with the option
+    const result =await Video.aggregatePaginate(Video.aggregate(video),options);//this is use to do pagination
+    console.log(result);
+    
+
+    res.status(200).json(
+        new APIResponse(200,result,"Done")
+    )
+})
+
+
 
 
 const publishAVideo = asyncHandler1(async (req, res) => {
@@ -161,4 +206,4 @@ const togglePublishStatus = asyncHandler1(async (req, res) => {
 })
 
 
-export {publishAVideo,getVideoById,updateVideo,deleteVideo,togglePublishStatus}
+export {publishAVideo,getVideoById,updateVideo,deleteVideo,togglePublishStatus,getAllVideos}

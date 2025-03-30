@@ -1,11 +1,12 @@
 import { Router } from "express";
 import {upload} from '../middlewares/multer.middleware.js'
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import {deleteVideo, getVideoById, publishAVideo, togglePublishStatus, updateVideo} from "../controllers/video.controller.js"
+import {deleteVideo, getAllVideos, getVideoById, publishAVideo, togglePublishStatus, updateVideo} from "../controllers/video.controller.js"
 
 
 const router=Router();
 
+router.route("/get-all-videos").get(getAllVideos);
 
 router.route("/upload-video").post(verifyJWT,upload.fields([
     //uploads.fields to accept the array of the uploaded files from different names
