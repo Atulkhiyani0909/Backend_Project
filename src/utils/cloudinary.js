@@ -27,7 +27,7 @@ import fs from 'fs'; //file system avaliable in Node.js to use files in the back
             console.log("File uploaded to cloudinary")
             console.log(file_Details);
 
-            fs.unlinkSync(localFilePath); //removing the files from the local storage after uploading them to cloudinary
+            await fs.unlinkSync(localFilePath); //removing the files from the local storage after uploading them to cloudinary
             
             if(!file_Details) return null;
             return file_Details;

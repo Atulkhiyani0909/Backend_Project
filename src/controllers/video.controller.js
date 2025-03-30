@@ -4,6 +4,7 @@ import {uploadToCloudinary} from "../utils/cloudinary.js"
 import {APIError} from "../utils/ApiError.js"
 import {APIResponse} from "../utils/ApiResponse.js"
 import {asyncHandler1} from "../utils/asyncHandler.js"
+import {OwnerCheck} from "../utils/videoOwner.js"
 
 
 const publishAVideo = asyncHandler1(async (req, res) => {
@@ -80,47 +81,9 @@ const updateVideo = asyncHandler1(async (req, res) => {
         )
     }
 
-    const videoOwner = await Video.aggregate([
-        {
-          $match: {
-            _id: new mongoose.Types.ObjectId(videoId)
-          }
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "owner",
-            foreignField: "_id",
-            as: "Owner",     // project is written inside the lookup so it can bring the required field only
-            pipeline: [
-              {
-                $project: {
-                  _id:1,
-                  Name: 1,
-                  username: 1,
-                  email: 1
-                }
-              }
-            ]
-          }
-        },
-        {
-          $unwind: {
-            path: "$Owner",
-            preserveNullAndEmptyArrays: true
-          }
-        }
-      ]);
-      
-    
-    if(!((req.user._id).toString() === (videoOwner[0].Owner._id).toString())){
-        console.log("You Can't Edit this Video not Owner");
-        return res.status(403).json(
-            new APIResponse(403,{},"Not an Owner")
-        );
-    }
     
     //TODO: update video details like title, description, thumbnail
+     await OwnerCheck(videoId , req);
 
    const thumbnailLocalPath=req.file?.path || checkVideo.thumbnail;
    
@@ -146,11 +109,56 @@ const updateVideo = asyncHandler1(async (req, res) => {
 const deleteVideo = asyncHandler1(async (req, res) => {
     const { videoId } = req.params
     //TODO: delete video
+    const video=await Video.findById(videoId);
+
+    if(!video){
+        return res.status(400).json(
+            new APIResponse(400,{},"Video Not Found")
+        )
+    }
+  
+    
+    await OwnerCheck(videoId,req);
+
+    const deleteVideo=await Video.findByIdAndDelete(videoId).select("-isPublished -owner");
+
+    if(!deleteVideo){
+        return res.status(400).json(
+            new APIResponse(400,{},"Error in Deleting the Video")
+        )
+    }
+
+    return res.status(200).json(
+        new APIResponse(200,{deleteVideo},"Video Deleted Succesfully")
+    )
 })
 
 const togglePublishStatus = asyncHandler1(async (req, res) => {
     const { videoId } = req.params
+
+    const video = await Video.findById(videoId);
+    if(!video){
+        return res.status(400).json(
+            new APIResponse(400,{},"Video Not Found")
+        )
+    } 
+    
+    await OwnerCheck(videoId,req);
+
+    video.isPublished = !video.isPublished;
+    await video.save();
+
+
+    if(!video){
+        return res.status(400).json(
+            new APIResponse(400,{},"Error in Updating Status")
+        )
+    }
+
+    return res.status(200).json(
+        new APIResponse(200,video,"Status Updated SuccessFully")
+    )
 })
 
 
-export {publishAVideo,getVideoById,updateVideo}
+export {publishAVideo,getVideoById,updateVideo,deleteVideo,togglePublishStatus}
