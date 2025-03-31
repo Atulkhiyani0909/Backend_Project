@@ -29,7 +29,11 @@ const getAllVideos = asyncHandler1(async (req, res) => {
         {
             $project:{
                 title:1,
-                description:1
+                description:1,
+                thumbnail:1,
+                duration:1,
+                views:1,
+                videoFile:1
             }
         }
     ]
@@ -101,16 +105,65 @@ const publishAVideo = asyncHandler1(async (req, res) => {
 
 const getVideoById = asyncHandler1(async (req, res) => {
     const { videoId } = req.params;
-    
-    let videoInfo=await Video.findById(videoId).select("-isPublished");
-    
-   //TODO: get video by id
+
+    const videoInfo=await Video.findById(videoId);
+
     if(!videoInfo){
         throw new APIError(400,"Video Requested Doesn't Exists");
     }
 
+    const video = await Video.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "Owner",
+                pipeline: [//as now I am inside the Owner details start from there 
+                    {
+                        $lookup: {
+                            from: "subscriptions",
+                            localField: "_id",
+                            foreignField: "channel",
+                            as: "Subscribers",
+                        }
+                    },
+                    {
+                        $addFields: {
+                            subscriberCount: { $size: "$Subscribers" }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 1, // Include if needed
+                            username: 1,
+                            email: 1,
+                            avatar: 1,
+                            subscriberCount: 1 // Now included
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: {
+                path: "$Owner",// as all info is inside this open it and take its value
+                preserveNullAndEmptyArrays: true
+            }
+        }
+    ]);
+    
+    
+   //TODO: get video by id
+   
+
     return res.status(201).json(
-        new APIResponse(200,videoInfo,"Video Found SuccessFully")
+        new APIResponse(200,video,"Video Found SuccessFully")
     )
     
 })

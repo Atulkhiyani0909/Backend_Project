@@ -1,12 +1,9 @@
-export const videos = [
+
+export const videoss = [
   {
     id: '1',
     title: 'Building a Modern Web Application',
     thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085',
-    channel: {
-      name: 'TechChannel',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde'
-    },
     views: '120K',
     timestamp: '2 days ago'
   },
@@ -46,6 +43,7 @@ export const comments = [
   }
 ];
 
+
 export const userProfile = {
   id: '1',
   name: 'TechChannel',
@@ -54,5 +52,5 @@ export const userProfile = {
   subscribers: '1.2M',
   totalViews: '10M',
   joinedDate: 'Jan 15, 2020',
-  uploadedVideos: videos
+  uploadedVideos: videoss
 };

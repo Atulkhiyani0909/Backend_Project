@@ -1,12 +1,27 @@
 import { useParams } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Share, MessageCircle } from 'lucide-react';
-import { videos, comments } from '../data';
 import VideoCard from '../components/VideoCard';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+
 
 export default function VideoPage() {
+  const [video,setVideo]=useState({});
+  const [Owner,setOwner]=useState({})
   const { id } = useParams();
-  const video = videos.find(v => v.id === id);
-  const relatedVideos = videos.filter(v => v.id !== id);
+  useEffect(()=>{
+    async function getVideoById(){
+        let data =await axios.get(`http://localhost:8080/api/v1/videos/getVideo/${id}`);
+        console.log(data);
+        
+        setVideo(data.data.data[0]);
+        setOwner(data.data.data[0].Owner)
+    }
+    getVideoById();
+  },[])
+
+ 
+
 
   if (!video) return <div>Video not found</div>;
 
@@ -14,11 +29,7 @@ export default function VideoPage() {
     <div className="flex flex-col lg:flex-row gap-6 p-4 dark:bg-gray-900">
       <div className="flex-1">
         <div className="aspect-video">
-          <img
-            src={video.thumbnail}
-            alt={video.title}
-            className="w-full h-full object-cover rounded-xl"
-          />
+        <video src={video.videoFile} autoPlay controls className="w-[90%] h-[90%] object-cover rounded-xl"></video>
         </div>
         
         <h1 className="text-xl font-bold mt-4 dark:text-white">{video.title}</h1>
@@ -26,13 +37,13 @@ export default function VideoPage() {
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-4">
             <img
-              src={video.channel.avatar}
-              alt={video.channel.name}
+              src={Owner.avatar}
+              alt={Owner.username}
               className="w-10 h-10 rounded-full"
             />
             <div>
-              <h3 className="font-medium dark:text-white">{video.channel.name}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">1.2M subscribers</p>
+              <h3 className="font-medium dark:text-white">{Owner.username}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{Owner.subscriberCount} subscribers</p>
             </div>
             <button className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-full">
               Subscribe
@@ -54,7 +65,8 @@ export default function VideoPage() {
           </div>
         </div>
 
-        <div className="mt-6">
+        {video.description}
+        {/* {<div className="mt-6">
           <h3 className="text-xl font-bold mb-4 dark:text-white">
             {comments.length} Comments
           </h3>
@@ -70,8 +82,8 @@ export default function VideoPage() {
               className="flex-1 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-gray-600 outline-none py-1"
             />
           </div>
-          
-          {comments.map(comment => (
+           */}
+          {/* {comments.map(comment => (
             <div key={comment.id} className="flex gap-4 mb-4">
               <img
                 src={comment.user.avatar}
@@ -96,11 +108,11 @@ export default function VideoPage() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          ))} */}
+        {/* </div>  } */}
       </div>
       
-      <div className="lg:w-96">
+      {/* <div className="lg:w-96">
         <h2 className="font-bold mb-4 dark:text-white">Related Videos</h2>
         <div className="flex flex-col gap-4">
           {relatedVideos.map(video => (
@@ -111,7 +123,7 @@ export default function VideoPage() {
             />
           ))}
         </div>
-      </div>
+      </div> */}    
     </div>
   );
 }

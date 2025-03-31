@@ -333,17 +333,19 @@ const updateUserCoverImage=asyncHandler1(async(req,res)=>{
 })
 
 const getUserChannelProfile=asyncHandler1(async(req,res)=>{
-    const {Name}=req.params
+    const {username}=req.params
 
-    if(!Name?.trim()){
+    if(!username?.trim()){
       throw new APIError(400,"userName is missing");
     }
+    console.log(username);
+    
 
     //this is the aggregate it taks the array and we can write the pipelines inside it 
     const channel =await User.aggregate([
       {
       $match:{
-        Name:Name?.toLowerCase(),
+        username:username?.toLowerCase(),
       }
     },
     {
@@ -363,7 +365,7 @@ const getUserChannelProfile=asyncHandler1(async(req,res)=>{
         }
       },
       {
-        $addfiled:{//this field are added in the final answer obj.
+        $addFields:{//this field are added in the final answer obj.
           subscriberCount:{
             $size:"$subscribers"
           },
@@ -402,7 +404,7 @@ const getUserChannelProfile=asyncHandler1(async(req,res)=>{
     throw new APIError(404,"Channel Not Found");
   }
 
-  return res.status(200).json(new APIResponse(200,channel[0],"Channel Profile"));
+  return res.status(200).json(new APIResponse(200,channel,"Channel Profile"));
 })
 
 const getWatchHistory=asyncHandler1(async(req,res)=>{
@@ -448,7 +450,6 @@ const getWatchHistory=asyncHandler1(async(req,res)=>{
       ]
     }
   }
-
 ])
 
 
